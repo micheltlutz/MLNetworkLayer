@@ -1,11 +1,17 @@
 import Foundation
 
 public protocol RequestConfigProtocol {
+    /// The config's base `SCHEME` http, https.
+    var scheme: String { get }
+    
     /// The config's base `HOST`.
     var host: String { get }
 
-    /// The path to be appended to `host` to form the full `URL`.
+    /// The path to be appended to `path` to form the full `URL`.
     var path: String { get }
+    
+    /// The path to be appended to `port` to form the full `URL`.
+    var port: Int? { get }
 
     /// The HTTP method used in the request.
     var method: HTTPMethod { get }
@@ -45,9 +51,10 @@ extension RequestConfigProtocol {
     */
     func createUrlRequest() -> URLRequest? {
         var urlComponents = URLComponents()
-        urlComponents.scheme = "https"
+        urlComponents.scheme = scheme
         urlComponents.host = host
         urlComponents.path = path
+        urlComponents.port = port
 
         guard let url = urlComponents.url else { return nil }
 

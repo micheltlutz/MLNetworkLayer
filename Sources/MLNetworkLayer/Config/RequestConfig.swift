@@ -2,11 +2,17 @@ import Foundation
 
 /// This implementation for `RequestConfigProtocol` form generic requests
 public struct RequestConfig: RequestConfigProtocol {
+    /// The config's base `SCHEME` http, https.
+    public var scheme: String
+
     /// The base host form Request
     public var host: String
 
     /// The endpoint path to complete url for request
     public var path: String
+    
+    /// The endpoint port to complete url for request
+    public var port: Int?
 
     /// The `HTTPMethod` `(.connect, .delete, .get, .head, .options, .patch, .post, .put, .trace)` default `.get`
     public var method: HTTPMethod
@@ -39,8 +45,10 @@ public struct RequestConfig: RequestConfigProtocol {
      Initializes a new `RequestConfig`
 
         - Parameters:
+           - scheme The config's base `SCHEME` http, https.
            - host: The base host form Request default value global config constant `linkServerRaw`
            - path: The endpoint path to complete url for request
+           - port: The endpoint port to complete url for request
            - provider: The data provider `(.network, .stub)`
            - method: The `HTTPMethod` `(.connect, .delete, .get, .head, .options, .patch, .post, .put, .trace)` default `.get`
            - encoding: The request `parametersEncoding` `.url` or `.body` default `.url`
@@ -50,8 +58,10 @@ public struct RequestConfig: RequestConfigProtocol {
            - dateDecodeStrategy: The `JSONDecoder.DateDecodingStrategy` default `nil`
            - debugMode: Toggle debug mode default `false`
     */
-    public init(host: String,
+    public init(scheme: String = "https",
+                host: String,
                 path: String,
+                port: Int? = nil,
                 provider: NetworkProviderType = .network,
                 method: HTTPMethod = .get,
                 encoding: ParameterEncoding = .url,
@@ -60,8 +70,10 @@ public struct RequestConfig: RequestConfigProtocol {
                 bundleClass: AnyClass? = nil,
                 dateDecodeStrategy: JSONDecoder.DateDecodingStrategy? = nil,
                 debugMode: Bool = true) {
+        self.scheme = scheme
         self.host = host
         self.path = path
+        self.port = port
         self.provider = provider
         self.method = method
         self.parameters = parameters
