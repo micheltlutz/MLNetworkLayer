@@ -1,12 +1,12 @@
 import Foundation
 
 ///The great class `NetworkManager`
-public final class NetworkManager {
+public final class NetworkManager: @unchecked Sendable {
     ///URLSession constant
     private let session: URLSession
 
     ///The DispatchQueue
-    private var queue: DispatchQueue
+    private let queue: DispatchQueue
 
     ///The default `JSON` decoder
     private let decoder = JSONDecoder()
@@ -68,13 +68,30 @@ public final class NetworkManager {
 // MARK: - NetworkManagerProtocol
 extension NetworkManager: NetworkManagerProtocol {
     /**
-    The request function
+    The request function (async/await)
+       - Parameters:
+         - config: The RequestConfigProtocol
+       - Returns: Tuple with decoded object and optional header
+       - Throws: ErrorHandler if request fails
+    */
+    public func request<T: Decodable, H: Decodable>(with config: RequestConfigProtocol) async throws -> (object: T, header: H?) {
+        switch config.provider {
+        case .network:
+            return try await networkRequestAsync(with: config)
+        case .stub:
+            throw ErrorHandler(defaultError: NetworkErrors.malformedUrl)
+        }
+    }
+    
+    /**
+    The request function (callback-based, legacy)
        - Parameters:
          - config: The RequestConfigProtocol
          - completion: The `Result<T, ErrorHandler>) -> Void`
     */
+    @available(*, deprecated, message: "Use async/await version: request(with:) async throws -> (T, H?)")
     public func request<T: Decodable, H: Decodable>(with config: RequestConfigProtocol,
-                                                    completion: @escaping (Result<(object: T, header: H?), ErrorHandler>) -> Void) {
+                                                    completion: @escaping @Sendable (Result<(object: T, header: H?), ErrorHandler>) -> Void) {
 
         switch config.provider {
         case .network:
@@ -83,6 +100,50 @@ extension NetworkManager: NetworkManagerProtocol {
         case .stub:
             break
 //            stubRequest(with: config, completion: completion)
+        }
+    }
+    
+    private func networkRequestAsync<T: Decodable, H: Decodable>(with config: RequestConfigProtocol) async throws -> (object: T, header: H?) {
+        guard let urlRequest = config.createUrlRequest() else {
+            throw ErrorHandler(defaultError: NetworkErrors.malformedUrl)
+        }
+        
+        do {
+            let (data, response) = try await session.data(for: urlRequest)
+            
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw NetworkErrors.unknownFailure
+            }
+            
+            try validateStatusCode(with: httpResponse.statusCode)
+            
+            let objectHeader = try? decodeHeaderWith(object: H.self, data: httpResponse.allHeaderFields)
+            
+            if let dateDecodingStrategy = config.dateDecodeStrategy {
+                decoder.dateDecodingStrategy = dateDecodingStrategy
+            }
+            
+            let object = try decoder.decode(T.self, from: data.value)
+            checkPrintDebugData(title: "Decoding", debug: config.debugMode, url: urlRequest.url?.absoluteString, data: data, curl: urlRequest.curlString)
+            
+            return (object: object, header: objectHeader)
+            
+        } catch let error as NetworkErrors {
+            throw ErrorHandler(statusCode: error.code, data: nil, defaultError: error)
+        } catch let error as NetworkErrors.HTTPErrors {
+            throw ErrorHandler(statusCode: error.code, data: nil, defaultError: error)
+        } catch is DecodingError {
+            throw ErrorHandler(defaultError: NetworkErrors.decoderFailure)
+        } catch let error as ErrorHandler {
+            throw error
+        } catch {
+            if (error as NSError).code == NetworkErrors.connectionLost.code {
+                throw ErrorHandler(defaultError: NetworkErrors.connectionLost)
+            } else if (error as NSError).code == NetworkErrors.notConnected.code {
+                throw ErrorHandler(defaultError: NetworkErrors.notConnected)
+            } else {
+                throw ErrorHandler(defaultError: NetworkErrors.requestFailure)
+            }
         }
     }
     
@@ -173,9 +234,13 @@ extension NetworkManager: NetworkManagerProtocol {
        - Parameter on: The `DispatchQueue` response
 
        - Returns: Self
+       
+       - Note: This method is deprecated in favor of async/await. Consider using the async request method instead.
      */
+    @available(*, deprecated, message: "Use async/await API instead. This method will be removed in version 3.0")
     public func receive(on queue: DispatchQueue) -> Self {
-        self.queue = queue
+        // Since queue is now immutable (let), this method can't change it
+        // This is intentional as we move away from this pattern
         return self
     }
 }

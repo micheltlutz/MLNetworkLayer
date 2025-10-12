@@ -1,7 +1,7 @@
 import Foundation
 
 ///  HTTP Methods available for NetworkKit
-public enum HTTPMethod: String {
+public enum HTTPMethod: String, Sendable {
     ///The `CONNECT` method establishes a tunnel to the server identified by the target resource.
     case connect = "CONNECT"
 

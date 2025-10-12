@@ -1,7 +1,7 @@
 import Foundation
 
 ///Struct entity for `DefaultError`
-public struct DefaultError: Decodable {
+public struct DefaultError: Decodable, Sendable {
 
     ///A `String` message
     var message: String

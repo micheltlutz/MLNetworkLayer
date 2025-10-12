@@ -1,6 +1,6 @@
 import Foundation
 
-public struct ResponseHeader: Decodable, Equatable {
+public struct ResponseHeader: Decodable, Equatable, Sendable {
     public let userInfo: String?
     public let contentType: String?
     public let contentLength: String?

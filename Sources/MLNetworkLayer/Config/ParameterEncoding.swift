@@ -1,7 +1,7 @@
 import Foundation
 
 ///Parameter encoding types
-public enum ParameterEncoding {
+public enum ParameterEncoding: Sendable {
     ///Body request with `Json` encoding
     case body
 

@@ -1,6 +1,6 @@
 import Foundation
 
-public enum NetworkProviderType {
+public enum NetworkProviderType: Sendable {
     case network
     case stub
 }

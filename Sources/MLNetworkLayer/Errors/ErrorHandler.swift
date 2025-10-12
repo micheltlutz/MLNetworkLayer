@@ -1,6 +1,6 @@
 import Foundation
 
-public struct ErrorHandler: LocalizedError {
+public struct ErrorHandler: LocalizedError, Sendable {
     /// A `String` message
     var message: String
 

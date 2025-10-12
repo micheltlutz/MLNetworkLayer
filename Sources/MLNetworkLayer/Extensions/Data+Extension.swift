@@ -3,13 +3,12 @@ import Foundation
 /// Simple extensions for Data
 public extension Data {
 
-    /// Return Data with `utf8` value
+    /// Return Data with `utf8` value, returns empty JSON object if data is empty
     var value: Data {
-        guard self.isEmpty,
-            let data = "{}".data(using: .utf8) else {
-            return self
+        guard !self.isEmpty else {
+            return "{}".data(using: .utf8) ?? self
         }
-        return data
+        return self
     }
 
     // MARK: - For test uses

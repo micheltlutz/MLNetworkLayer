@@ -1,7 +1,7 @@
 import Foundation
 
 /// This implementation for `RequestConfigProtocol` form generic requests
-public struct RequestConfig: RequestConfigProtocol {
+public struct RequestConfig: RequestConfigProtocol, @unchecked Sendable {
     /// The config's base `SCHEME` http, https.
     public var scheme: String
 
@@ -84,7 +84,7 @@ public struct RequestConfig: RequestConfigProtocol {
         self.debugMode = debugMode
 
         if provider == .stub && bundleClass == nil {
-            fatalError("To use .stub network provide a bundleCalss")
+            assertionFailure("To use .stub network provide a bundleClass")
         }
     }
 }

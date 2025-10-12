@@ -1,7 +1,7 @@
 import Foundation
 
 ///NetworkErrors protocol
-public protocol NetworkErrorsProtocol {
+public protocol NetworkErrorsProtocol: Sendable {
     ///The `Int` code
     var code: Int { get }
 

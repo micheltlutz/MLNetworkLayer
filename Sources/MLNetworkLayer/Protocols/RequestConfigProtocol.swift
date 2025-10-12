@@ -1,6 +1,6 @@
 import Foundation
 
-public protocol RequestConfigProtocol {
+public protocol RequestConfigProtocol: Sendable {
     /// The config's base `SCHEME` http, https.
     var scheme: String { get }
     
