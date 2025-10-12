@@ -1,5 +1,9 @@
 # 🔍 Análise do MLNetworkLayer - Problemas e Melhorias
 
+> **Projeto:** MLNetworkLayer  
+> **Autor:** Michel Tlutz ([@micheltlutz](https://github.com/micheltlutz))  
+> **Website:** [micheltlutz.me](https://micheltlutz.me)
+
 ## 📊 Resumo Executivo
 
 **Versão Atual:** 1.1.0 (Swift 5.10)  
@@ -617,7 +621,17 @@ O **MLNetworkLayer** tem uma base sólida com arquitetura limpa, mas precisa de 
 
 ---
 
+## 👨‍💻 Sobre o Projeto
+
+**MLNetworkLayer** foi desenvolvido por **Michel Tlutz** como uma solução robusta e moderna para requisições de rede em aplicativos Swift.
+
+- 🌐 **Website:** [micheltlutz.me](https://micheltlutz.me)
+- 💼 **GitHub:** [@micheltlutz](https://github.com/micheltlutz)
+- 📦 **Repositório:** [github.com/micheltlutz/MLNetworkLayer](https://github.com/micheltlutz/MLNetworkLayer)
+
+---
+
 **Documento gerado em:** 12 de Outubro de 2025  
 **Versão do Documento:** 1.0  
-**Autor:** Análise Automatizada MLNetworkLayer
+**Autor:** Michel Tlutz
 

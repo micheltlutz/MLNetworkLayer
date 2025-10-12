@@ -1,5 +1,10 @@
 # 📊 Resumo da Atualização - MLNetworkLayer v2.0.0
 
+> **Projeto:** MLNetworkLayer  
+> **Autor:** Michel Tlutz ([@micheltlutz](https://github.com/micheltlutz))  
+> **Website:** [micheltlutz.me](https://micheltlutz.me)  
+> **Repositório:** [github.com/micheltlutz/MLNetworkLayer](https://github.com/micheltlutz/MLNetworkLayer)
+
 ## ✅ Trabalho Concluído
 
 ### 📝 Documentação Criada
@@ -403,7 +408,18 @@ O projeto está **pronto para produção** com Swift 6 e segue as melhores prát
 **Versão do Documento:** 1.0  
 **Data:** 12 de Outubro de 2025  
 **Versão do Framework:** 2.0.0  
-**Swift Version:** 6.0+
+**Swift Version:** 6.0+  
+**Autor:** Michel Tlutz
 
-**Desenvolvido com ❤️ e Swift 6**
+---
+
+## 👨‍💻 Sobre o Autor
+
+**Michel Tlutz** é desenvolvedor iOS especializado em Swift e arquitetura de software.
+
+- 🌐 **Website:** [micheltlutz.me](https://micheltlutz.me)
+- 💼 **GitHub:** [@micheltlutz](https://github.com/micheltlutz)
+- 📦 **MLNetworkLayer:** [github.com/micheltlutz/MLNetworkLayer](https://github.com/micheltlutz/MLNetworkLayer)
+
+**Desenvolvido com ❤️ e Swift 6 por Michel Tlutz**
 

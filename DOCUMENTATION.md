@@ -1,5 +1,9 @@
 # 📚 Documentação MLNetworkLayer
 
+> **Autor:** Michel Tlutz  
+> **Website:** [micheltlutz.me](https://micheltlutz.me)  
+> **GitHub:** [@micheltlutz](https://github.com/micheltlutz)
+
 ## 📋 Índice
 - [Visão Geral](#visão-geral)
 - [Arquitetura](#arquitetura)
@@ -791,7 +795,7 @@ Adicione ao seu `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/seu-usuario/MLNetworkLayer.git", from: "1.1.0")
+    .package(url: "https://github.com/micheltlutz/MLNetworkLayer.git", from: "2.0.0")
 ]
 ```
 
@@ -814,5 +818,24 @@ O **MLNetworkLayer** oferece uma solução completa e flexível para requisiçõ
 - ✅ Type-safe com Codable
 - ✅ Flexível e extensível
 
-Para mais informações e atualizações, consulte o repositório oficial.
+## 👨‍💻 Sobre o Autor
+
+**Michel Tlutz** é um desenvolvedor iOS especializado em Swift e arquitetura de software.
+
+- 🌐 **Website:** [micheltlutz.me](https://micheltlutz.me)
+- 💼 **GitHub:** [@micheltlutz](https://github.com/micheltlutz)
+- 🚀 **Projetos:** Diversos frameworks e bibliotecas open source
+
+---
+
+## 📞 Suporte e Contato
+
+Para dúvidas, sugestões ou contribuições:
+
+1. 🐛 Abra uma [issue no GitHub](https://github.com/micheltlutz/MLNetworkLayer/issues)
+2. 💬 Inicie uma [discussão](https://github.com/micheltlutz/MLNetworkLayer/discussions)
+3. 🌐 Visite [micheltlutz.me](https://micheltlutz.me)
+4. ⭐ Dê uma estrela no repositório se este projeto foi útil!
+
+Para mais informações e atualizações, consulte o [repositório oficial](https://github.com/micheltlutz/MLNetworkLayer).
 

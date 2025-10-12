@@ -3,7 +3,9 @@
 [![Swift](https://img.shields.io/badge/Swift-6.0-orange.svg)](https://swift.org)
 [![Platform](https://img.shields.io/badge/Platform-iOS%20%7C%20macOS%20%7C%20tvOS%20%7C%20watchOS%20%7C%20visionOS-lightgrey.svg)](https://developer.apple.com)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-2.0.0-green.svg)](https://github.com/yourusername/MLNetworkLayer)
+[![Version](https://img.shields.io/badge/Version-2.0.0-green.svg)](https://github.com/micheltlutz/MLNetworkLayer)
+[![GitHub](https://img.shields.io/badge/GitHub-micheltlutz-181717.svg?logo=github)](https://github.com/micheltlutz)
+[![Website](https://img.shields.io/badge/Website-micheltlutz.me-00ADD8.svg)](https://micheltlutz.me)
 
 Uma camada de rede moderna, type-safe e baseada em Swift Concurrency para aplicativos iOS, macOS, tvOS, watchOS e visionOS.
 
@@ -37,7 +39,7 @@ Adicione MLNetworkLayer às dependências do seu projeto no `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/yourusername/MLNetworkLayer.git", from: "2.0.0")
+    .package(url: "https://github.com/micheltlutz/MLNetworkLayer.git", from: "2.0.0")
 ]
 ```
 
@@ -552,13 +554,20 @@ Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE](LICE
 
 ## 👨‍💻 Autor
 
-Michel Lopes - [@yourusername](https://github.com/yourusername)
+**Michel Tlutz**
+- 🌐 Website: [micheltlutz.me](https://micheltlutz.me)
+- 💼 GitHub: [@micheltlutz](https://github.com/micheltlutz)
+- 📧 Email: Disponível no site
 
-## 🙏 Agradecimentos
+---
 
-- Apple pela excelente documentação do Swift
-- Comunidade Swift pelo feedback e contribuições
-- Todos os contribuidores deste projeto
+## 🔗 Links Úteis
+
+- 📖 [Documentação Completa](DOCUMENTATION.md)
+- 🔍 [Análise Técnica](ANALYSIS.md)
+- 📝 [Changelog](CHANGELOG.md)
+- 🌐 [Website do Autor](https://micheltlutz.me)
+- 💻 [GitHub do Autor](https://github.com/micheltlutz)
 
 ---
 
