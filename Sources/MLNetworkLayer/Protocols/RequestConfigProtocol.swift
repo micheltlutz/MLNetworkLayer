@@ -1,54 +1,52 @@
 import Foundation
 
+/// Descreve host, caminho, método, parâmetros e opções de decodificação para uma chamada HTTP.
+///
+/// Implementações típicas incluem ``RequestConfig``. O protocolo é ``Sendable``; implementações com
+/// `[String: Any]` costumam usar `@unchecked Sendable` com contrato de imutabilidade durante a requisição.
 public protocol RequestConfigProtocol: Sendable {
-    /// The config's base `SCHEME` http, https.
+    /// Esquema da URL (`http`, `https`).
     var scheme: String { get }
-    
-    /// The config's base `HOST`.
+
+    /// Host do servidor.
     var host: String { get }
 
-    /// The path to be appended to `path` to form the full `URL`.
+    /// Caminho do endpoint (por exemplo `/v1/users`).
     var path: String { get }
-    
-    /// The path to be appended to `port` to form the full `URL`.
+
+    /// Porta opcional.
     var port: Int? { get }
 
-    /// The HTTP method used in the request.
+    /// Método HTTP.
     var method: HTTPMethod { get }
 
-    /// The URL parameters used in the request.
+    /// Parâmetros de URL ou corpo, conforme ``ParameterEncoding``.
     var parameters: [String: Any] { get set }
 
-    /// The headers parameters used in the request.
+    /// Cabeçalhos HTTP adicionais.
     var headers: [String: String] { get }
 
-    /// The JSONDecoder dateDecodeStrategy used in the request.
+    /// Estratégia opcional de datas para ``JSONDecoder``.
     var dateDecodeStrategy: JSONDecoder.DateDecodingStrategy? { get }
 
-    /// The `ParameterEncoding` used in the request. `ParameterEncoding.swift`
+    /// Como `parameters` são serializados (query ou JSON no corpo).
     var parametersEncoding: ParameterEncoding { get }
 
-    /// Provides stub data for use in testing.
+    /// Dados de exemplo para testes (opcional).
     var sampleData: Data? { get }
 
-    /// Flag to print debug info in console
+    /// Quando `true`, em builds de debug o manager pode registrar URL e payload.
     var debugMode: Bool { get }
 
-    /// indicates which data provider will be used.
+    /// Origem da resposta: rede real ou arquivo stub no bundle.
     var provider: NetworkProviderType { get set }
 
-    /// Provides a bundle class for provider use with stub
+    /// Classe usada para localizar o bundle em requisições `.stub`.
     var bundleClass: AnyClass? { get set }
 }
 
 extension RequestConfigProtocol {
-    /**
-     This function create and return an UrlRequest
-
-     - Parameter config: The inplementation of `RequestConfigProtocol`
-
-     - Returns: `URLRequest?`
-    */
+    /// Monta um `URLRequest` a partir dos campos do protocolo.
     func createUrlRequest() -> URLRequest? {
         var urlComponents = URLComponents()
         urlComponents.scheme = scheme

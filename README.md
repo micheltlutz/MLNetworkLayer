@@ -3,7 +3,7 @@
 [![Swift](https://img.shields.io/badge/Swift-6.0-orange.svg)](https://swift.org)
 [![Platform](https://img.shields.io/badge/Platform-iOS%20%7C%20macOS%20%7C%20tvOS%20%7C%20watchOS%20%7C%20visionOS-lightgrey.svg)](https://developer.apple.com)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-2.0.0-green.svg)](https://github.com/micheltlutz/MLNetworkLayer)
+[![Version](https://img.shields.io/badge/Version-3.0.0-green.svg)](https://github.com/micheltlutz/MLNetworkLayer)
 [![GitHub](https://img.shields.io/badge/GitHub-micheltlutz-181717.svg?logo=github)](https://github.com/micheltlutz)
 [![Website](https://img.shields.io/badge/Website-micheltlutz.me-00ADD8.svg)](https://micheltlutz.me)
 
@@ -24,6 +24,7 @@ Uma camada de rede moderna, type-safe e baseada em Swift Concurrency para aplica
 - ✅ **Protocol-Oriented Programming**
 - ✅ **Testável** com suporte a stubs/mocks
 - ✅ **100% Swift** sem dependências externas
+- ✅ **DocC** com artigo dedicado a concorrência e contratos de `Sendable`
 
 ## 📋 Requisitos
 
@@ -39,14 +40,22 @@ Adicione MLNetworkLayer às dependências do seu projeto no `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/micheltlutz/MLNetworkLayer.git", from: "2.0.0")
+    .package(url: "https://github.com/micheltlutz/MLNetworkLayer.git", from: "3.0.0")
 ]
 ```
 
 Ou via Xcode:
 1. File → Add Packages...
 2. Cole a URL do repositório
-3. Selecione a versão `2.0.0` ou superior
+3. Selecione a versão `3.0.0` ou superior
+
+## Documentação DocC
+
+O catálogo DocC do módulo fica em [`Sources/MLNetworkLayer/MLNetworkLayer.docc/`](Sources/MLNetworkLayer/MLNetworkLayer.docc/), com visão geral do pacote e o artigo **Concorrência e segurança** (cancelamento, `Sendable`, uso de `RequestConfig`).
+
+No **Xcode**: abra o pacote ou um projeto que dependa dele, depois **Product → Build Documentation** para navegar na documentação gerada a partir dos comentários `///` e do bundle `.docc`.
+
+Modelos de resposta usados com `NetworkManager` devem ser `Decodable` **e** `Sendable` (por exemplo `struct User: Codable, Sendable`), alinhados à verificação estrita de concorrência do Swift 6.
 
 ## 🚀 Início Rápido
 
@@ -55,8 +64,8 @@ Ou via Xcode:
 ```swift
 import MLNetworkLayer
 
-// 1. Defina seu modelo
-struct User: Codable {
+// 1. Defina seu modelo (`Sendable` exigido pela API pública)
+struct User: Codable, Sendable {
     let id: Int
     let name: String
     let email: String
@@ -86,7 +95,7 @@ do {
 ### GET Request
 
 ```swift
-struct Post: Codable {
+struct Post: Codable, Sendable {
     let id: Int
     let title: String
     let body: String
@@ -110,13 +119,13 @@ do {
 ### POST Request com Body
 
 ```swift
-struct CreateUserRequest: Codable {
+struct CreateUserRequest: Codable, Sendable {
     let name: String
     let email: String
     let age: Int
 }
 
-struct UserResponse: Codable {
+struct UserResponse: Codable, Sendable {
     let id: Int
     let name: String
     let email: String
@@ -151,12 +160,12 @@ do {
 ### GET com Query Parameters
 
 ```swift
-struct SearchResult: Codable {
+struct SearchResult: Codable, Sendable {
     let results: [Item]
     let totalCount: Int
 }
 
-struct Item: Codable {
+struct Item: Codable, Sendable {
     let id: Int
     let title: String
 }
@@ -212,7 +221,7 @@ print("Usuário deletado com sucesso!")
 ### Custom Date Decoding
 
 ```swift
-struct Article: Codable {
+struct Article: Codable, Sendable {
     let id: Int
     let title: String
     let publishedAt: Date
@@ -488,16 +497,19 @@ class MockNetworkManager: NetworkManagerProtocol {
     }
 }
 
-// Uso em testes:
-class UserServiceTests: XCTestCase {
-    func testFetchUserSuccess() async throws {
+// Uso em testes (Swift Testing):
+import Testing
+
+struct UserServiceTests {
+    @Test
+    func fetchUserSuccess() async throws {
         let mockManager = MockNetworkManager()
         mockManager.mockResponse = User(id: 1, name: "Test User", email: "test@example.com")
-        
+
         let service = UserService(networkManager: mockManager)
         let user = try await service.fetchUser(id: 1)
-        
-        XCTAssertEqual(user.name, "Test User")
+
+        #expect(user.name == "Test User")
     }
 }
 ```
@@ -526,7 +538,7 @@ networkManager.request(with: config) { result in
 }
 ```
 
-**Depois (v2.0 - async/await):**
+**Depois (async/await — recomendado desde a v2.0):**
 ```swift
 do {
     let response: (User, ResponseHeader?) = try await networkManager.request(with: config)
@@ -536,7 +548,14 @@ do {
 }
 ```
 
-**Nota:** A API callback-based ainda está disponível na v2.0 mas está marcada como deprecated e será removida na v3.0.
+**Nota:** A API callback-based continua disponível na v3.0, marcada como *deprecated*, com remoção planejada para a **versão 4.0**. Prefira sempre `async`/`await`.
+
+### De 2.x para 3.0
+
+- **`MLNetworkLayer.VERSION`:** passa a reportar `3.0.0` (apenas metadado para consumidores).
+- **Sem breaking changes** na API pública assíncrona típica (`request(with:)` com `async throws`).
+- **Testes do pacote:** migração para **Swift Testing**, organizados por contexto em `Tests/MLNetworkLayerTests/` (pastas e ficheiros por domínio).
+- Se integrares os testes deste repositório como referência, atualiza exemplos de `XCTest` para Swift Testing.
 
 ## 🤝 Contribuindo
 

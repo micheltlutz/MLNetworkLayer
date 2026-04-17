@@ -1,7 +1,10 @@
 import Foundation
 
+/// Erro de domínio retornado por ``NetworkManager`` com mensagem amigável e metadados opcionais.
+///
+/// Tipo valor ``Sendable``, adequado a repasse entre atores e tarefas após a conclusão da requisição.
 public struct ErrorHandler: LocalizedError, Sendable {
-    /// A `String` message
+    /// Mensagem apresentada em ``LocalizedError/errorDescription``.
     var message: String
 
     /// A  optional `String` errorCode

@@ -1,41 +1,49 @@
 import Foundation
 
-///The great class `NetworkManager`
-public final class NetworkManager: @unchecked Sendable {
-    ///URLSession constant
+/// Orquestra requisições HTTP com `URLSession` e decodificação JSON.
+///
+/// ## Concorrência
+/// - A API `async` é segura para chamadas concorrentes no mesmo `NetworkManager`: cada operação usa um
+///   ``JSONDecoder`` próprio, evitando condições de corrida na decodificação.
+/// - ``URLSession/data(for:)`` propaga o cancelamento da `Task` que aguarda a chamada.
+///
+/// ## Sessão e `networkServiceType`
+/// Se você omitir o parâmetro `session` no inicializador designado,
+/// uma `URLSession` é criada com ``URLSessionConfiguration/default`` e o `networkServiceType` informado.
+/// Se fornecer uma `URLSession` customizada, o `networkServiceType` do inicializador é ignorado.
+public final class NetworkManager: Sendable {
     private let session: URLSession
-
-    ///The DispatchQueue
     private let queue: DispatchQueue
 
-    ///The default `JSON` decoder
-    private let decoder = JSONDecoder()
-
-    /**
-     Initialization NetworkManager
-
-     - Parameters:
-        - queue: The `DispatchQueue` default `DispatchQueue.main`
-        - networkServiceType: The `NSURLRequest.NetworkServiceType`default `.responsiveData`
-        - session: The `URLSession` default `URLSession(configuration: .default)`
-     */
-    public init(queue: DispatchQueue = DispatchQueue.main,
-                networkServiceType: NSURLRequest.NetworkServiceType = .responsiveData,
-                session: URLSession = URLSession(configuration: .default)) {
-        self.session = session
-        self.session.configuration.networkServiceType = networkServiceType
+    /// Cria um gerenciador com fila de entrega para callbacks legados e sessão HTTP opcional.
+    ///
+    /// - Parameters:
+    ///   - queue: Fila usada para invocar o `completion` da API baseada em callback.
+    ///   - networkServiceType: Aplicado apenas quando `session` é `nil` (sessão criada internamente).
+    ///   - session: Sessão existente, ou `nil` para criar uma padrão com `networkServiceType` aplicado.
+    public init(
+        queue: DispatchQueue = DispatchQueue.main,
+        networkServiceType: NSURLRequest.NetworkServiceType = .responsiveData,
+        session: URLSession? = nil
+    ) {
         self.queue = queue
+        if let session {
+            self.session = session
+        } else {
+            let configuration = URLSessionConfiguration.default
+            configuration.networkServiceType = networkServiceType
+            self.session = URLSession(configuration: configuration)
+        }
     }
 
-    /**
-     Validate StatusCode
+    private func makeJSONDecoder(dateStrategy: JSONDecoder.DateDecodingStrategy?) -> JSONDecoder {
+        let decoder = JSONDecoder()
+        if let dateStrategy {
+            decoder.dateDecodingStrategy = dateStrategy
+        }
+        return decoder
+    }
 
-     - Parameter code: The Int `StatusCode`
-
-     - Throws: `NetworkErrors` by `code`
-
-     - Returns: Void
-    */
     private func validateStatusCode(with code: Int) throws {
         switch code {
         case 200...299:
@@ -67,67 +75,60 @@ public final class NetworkManager: @unchecked Sendable {
 
 // MARK: - NetworkManagerProtocol
 extension NetworkManager: NetworkManagerProtocol {
-    /**
-    The request function (async/await)
-       - Parameters:
-         - config: The RequestConfigProtocol
-       - Returns: Tuple with decoded object and optional header
-       - Throws: ErrorHandler if request fails
-    */
-    public func request<T: Decodable, H: Decodable>(with config: RequestConfigProtocol) async throws -> (object: T, header: H?) {
+    public func request<T: Decodable & Sendable, H: Decodable & Sendable>(with config: RequestConfigProtocol) async throws -> (object: T, header: H?) {
         switch config.provider {
         case .network:
             return try await networkRequestAsync(with: config)
         case .stub:
-            throw ErrorHandler(defaultError: NetworkErrors.malformedUrl)
+            return try await stubRequestAsync(with: config)
         }
     }
-    
-    /**
-    The request function (callback-based, legacy)
-       - Parameters:
-         - config: The RequestConfigProtocol
-         - completion: The `Result<T, ErrorHandler>) -> Void`
-    */
-    @available(*, deprecated, message: "Use async/await version: request(with:) async throws -> (T, H?)")
-    public func request<T: Decodable, H: Decodable>(with config: RequestConfigProtocol,
-                                                    completion: @escaping @Sendable (Result<(object: T, header: H?), ErrorHandler>) -> Void) {
 
+    @available(*, deprecated, message: "Use async/await version: request(with:) async throws -> (T, H?)")
+    public func request<T: Decodable & Sendable, H: Decodable & Sendable>(
+        with config: RequestConfigProtocol,
+        completion: @escaping @Sendable (Result<(object: T, header: H?), ErrorHandler>) -> Void
+    ) {
         switch config.provider {
         case .network:
             networkRequest(with: config, completion: completion)
 
         case .stub:
-            break
-//            stubRequest(with: config, completion: completion)
+            queue.async { [self] in
+                stubRequest(with: config) { (result: Result<T, ErrorHandler>) in
+                    switch result {
+                    case .success(let object):
+                        completion(.success((object: object, header: nil)))
+                    case .failure(let error):
+                        completion(.failure(error))
+                    }
+                }
+            }
         }
     }
-    
-    private func networkRequestAsync<T: Decodable, H: Decodable>(with config: RequestConfigProtocol) async throws -> (object: T, header: H?) {
+
+    private func networkRequestAsync<T: Decodable & Sendable, H: Decodable & Sendable>(with config: RequestConfigProtocol) async throws -> (object: T, header: H?) {
         guard let urlRequest = config.createUrlRequest() else {
             throw ErrorHandler(defaultError: NetworkErrors.malformedUrl)
         }
-        
+
         do {
             let (data, response) = try await session.data(for: urlRequest)
-            
+
             guard let httpResponse = response as? HTTPURLResponse else {
                 throw NetworkErrors.unknownFailure
             }
-            
+
             try validateStatusCode(with: httpResponse.statusCode)
-            
-            let objectHeader = try? decodeHeaderWith(object: H.self, data: httpResponse.allHeaderFields)
-            
-            if let dateDecodingStrategy = config.dateDecodeStrategy {
-                decoder.dateDecodingStrategy = dateDecodingStrategy
-            }
-            
+
+            let decoder = makeJSONDecoder(dateStrategy: config.dateDecodeStrategy)
+            let objectHeader = try? decodeHeaderWith(decoder: decoder, object: H.self, data: httpResponse.allHeaderFields)
+
             let object = try decoder.decode(T.self, from: data.value)
             checkPrintDebugData(title: "Decoding", debug: config.debugMode, url: urlRequest.url?.absoluteString, data: data, curl: urlRequest.curlString)
-            
+
             return (object: object, header: objectHeader)
-            
+
         } catch let error as NetworkErrors {
             throw ErrorHandler(statusCode: error.code, data: nil, defaultError: error)
         } catch let error as NetworkErrors.HTTPErrors {
@@ -146,36 +147,67 @@ extension NetworkManager: NetworkManagerProtocol {
             }
         }
     }
-    
-    private func networkRequest<T: Decodable, H: Decodable>(with config: RequestConfigProtocol, completion: @escaping (Result<(object: T, header: H?), ErrorHandler>) -> Void) {
+
+    private func stubRequestAsync<T: Decodable & Sendable, H: Decodable & Sendable>(with config: RequestConfigProtocol) async throws -> (object: T, header: H?) {
+        let object: T = try loadStubObject(with: config)
+        return (object: object, header: nil)
+    }
+
+    /// Carrega e decodifica o corpo do stub a partir do bundle (I/O síncrono; use apenas no caminho `async` do manager).
+    private func loadStubObject<T: Decodable & Sendable>(with config: RequestConfigProtocol) throws -> T {
+        guard let bundleClass = config.bundleClass else {
+            throw ErrorHandler(defaultError: NetworkErrors.malformedUrl)
+        }
+        let bundle = Bundle(for: bundleClass)
+
+        guard let stubURL = bundle.url(forResource: config.path, withExtension: "json") else {
+            checkPrintDebugData(title: "File not found", debug: config.debugMode, url: config.path, data: nil, curl: nil)
+            throw ErrorHandler(data: nil, defaultError: NetworkErrors.malformedUrl)
+        }
+
+        do {
+            let jsonData = try Data(contentsOf: stubURL)
+            let decoder = makeJSONDecoder(dateStrategy: config.dateDecodeStrategy)
+            let object = try decoder.decode(T.self, from: jsonData.value)
+            checkPrintDebugData(title: "Decoding Stub", debug: config.debugMode, url: stubURL.absoluteString, data: jsonData.value, curl: nil)
+            return object
+        } catch let error as DecodingError {
+            checkPrintDebugData(title: "DecodingError", debug: config.debugMode, url: stubURL.absoluteString, data: nil, curl: nil)
+            throw ErrorHandler(data: nil, defaultError: error)
+        } catch let error as ErrorHandler {
+            throw error
+        } catch {
+            checkPrintDebugData(title: "noData", debug: config.debugMode, url: stubURL.absoluteString, data: nil, curl: nil)
+            throw ErrorHandler(data: nil, defaultError: NetworkErrors.noData)
+        }
+    }
+
+    private func networkRequest<T: Decodable & Sendable, H: Decodable & Sendable>(
+        with config: RequestConfigProtocol,
+        completion: @escaping @Sendable (Result<(object: T, header: H?), ErrorHandler>) -> Void
+    ) {
         guard let urlRequest = config.createUrlRequest() else {
             completion(.failure(ErrorHandler(defaultError: NetworkErrors.malformedUrl)))
             return
         }
-        
-        var objectHeader: H?
 
         // swiftlint:disable closure_body_length
-        let task = session.dataTask(with: urlRequest) { data, response, error in
+        let task = session.dataTask(with: urlRequest) { data, response, sessionError in
             self.queue.async {
                 do {
-                    if let error = error {
-                        try self.checkErrorCodeWith(error)
+                    if let sessionError {
+                        try self.checkErrorCodeWith(sessionError)
                     } else if let response = response as? HTTPURLResponse {
-//                        try self.tokenManagerInterceptor.processRequestResponse(response: response, data: data)
                         try self.validateStatusCode(with: response.statusCode)
 
-                        objectHeader = try? self.decodeHeaderWith(object: H.self, data: response.allHeaderFields)
+                        let decoder = self.makeJSONDecoder(dateStrategy: config.dateDecodeStrategy)
+                        let objectHeader = try? self.decodeHeaderWith(decoder: decoder, object: H.self, data: response.allHeaderFields)
 
-                        guard let data = data else {
+                        guard let data else {
                             throw NetworkErrors.noData
                         }
 
-                        if let dateDecodingStrategy = config.dateDecodeStrategy {
-                            self.decoder.dateDecodingStrategy = dateDecodingStrategy
-                        }
-
-                        let object = try self.decoder.decode(T.self, from: data.value)
+                        let object = try decoder.decode(T.self, from: data.value)
                         self.checkPrintDebugData(title: "Decoding", debug: config.debugMode, url: urlRequest.url?.absoluteString, data: data, curl: urlRequest.curlString)
                         completion(.success((object: object, header: objectHeader)))
                     } else {
@@ -195,52 +227,27 @@ extension NetworkManager: NetworkManagerProtocol {
 
         task.resume()
     }
-    
-    private func stubRequest<T>(with config: RequestConfigProtocol, completion: @escaping (Result<T, ErrorHandler>) -> Void) where T: Decodable {
-        guard let bundleClass = config.bundleClass else { return }
-        let bundle = Bundle(for: bundleClass)
 
-        guard let stubURL = bundle.url(forResource: config.path, withExtension: "json") else {
-            self.checkPrintDebugData(title: "File not found", debug: config.debugMode, url: config.path, data: nil, curl: nil)
-            completion(.failure(ErrorHandler(data: nil, defaultError: NetworkErrors.malformedUrl)))
-
-            return
-        }
-
+    private func stubRequest<T: Decodable & Sendable>(
+        with config: RequestConfigProtocol,
+        completion: @escaping @Sendable (Result<T, ErrorHandler>) -> Void
+    ) {
         do {
-            let jsonData = try Data(contentsOf: stubURL)
-            if let dateDecodingStrategy = config.dateDecodeStrategy {
-                self.decoder.dateDecodingStrategy = dateDecodingStrategy
-            }
-
-            let object = try self.decoder.decode(T.self, from: jsonData.value)
-            self.checkPrintDebugData(title: "Decoding Stub", debug: config.debugMode, url: stubURL.absoluteString, data: jsonData.value, curl: nil)
+            let object: T = try loadStubObject(with: config)
             completion(.success(object))
-        } catch let error as DecodingError {
-            self.checkPrintDebugData(title: "DecodingError", debug: config.debugMode, url: stubURL.absoluteString, data: nil, curl: nil)
-            completion(.failure(ErrorHandler(data: nil, defaultError: error)))
+        } catch let error as ErrorHandler {
+            completion(.failure(error))
         } catch {
-            self.checkPrintDebugData(title: "noData", debug: config.debugMode, url: stubURL.absoluteString, data: nil, curl: nil)
             completion(.failure(ErrorHandler(data: nil, defaultError: NetworkErrors.noData)))
         }
     }
-    
-    private func decodeHeaderWith<H: Decodable>(object: H.Type, data: [AnyHashable: Any]) throws -> H? {
-        return try? self.decoder.decode(H.self, from: JSONSerialization.data(withJSONObject: data))
+
+    private func decodeHeaderWith<H: Decodable & Sendable>(decoder: JSONDecoder, object: H.Type, data: [AnyHashable: Any]) throws -> H? {
+        try? decoder.decode(H.self, from: JSONSerialization.data(withJSONObject: data))
     }
 
-    /**
-    The receive function
-       - Parameter on: The `DispatchQueue` response
-
-       - Returns: Self
-       
-       - Note: This method is deprecated in favor of async/await. Consider using the async request method instead.
-     */
-    @available(*, deprecated, message: "Use async/await API instead. This method will be removed in version 3.0")
+    @available(*, deprecated, message: "Use async/await API instead. This method will be removed in version 4.0")
     public func receive(on queue: DispatchQueue) -> Self {
-        // Since queue is now immutable (let), this method can't change it
-        // This is intentional as we move away from this pattern
         return self
     }
 }
@@ -265,10 +272,12 @@ extension NetworkManager {
         }
     }
 
-    private func genericCatchError<T, R>(urlRequest: URLRequest,
-                                         data: Data?, error: R,
-                                         config: RequestConfigProtocol,
-                                         completion: @escaping (Result<T, ErrorHandler>) -> Void) where R: NetworkErrorsProtocol {
+    private func genericCatchError<T, R>(
+        urlRequest: URLRequest,
+        data: Data?, error: R,
+        config: RequestConfigProtocol,
+        completion: @escaping @Sendable (Result<T, ErrorHandler>) -> Void
+    ) where R: NetworkErrorsProtocol {
         #if DEBUG
         if config.debugMode {
             self.printDebugData(title: String(describing: R.self),

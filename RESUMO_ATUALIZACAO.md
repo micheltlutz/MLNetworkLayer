@@ -1,5 +1,7 @@
 # 📊 Resumo da Atualização - MLNetworkLayer v2.0.0
 
+> **Versão atual do pacote:** **3.0.0** — ver [CHANGELOG.md](CHANGELOG.md). Este documento resume sobretudo a entrega **v2.0.0** (Swift 6 e async/await).
+
 > **Projeto:** MLNetworkLayer  
 > **Autor:** Michel Tlutz ([@micheltlutz](https://github.com/micheltlutz))  
 > **Website:** [micheltlutz.me](https://micheltlutz.me)  
@@ -245,7 +247,7 @@ private let queue: DispatchQueue  // Imutável (thread-safe)
 
 ### Arquivos Modificados
 - ✅ `Package.swift` - Atualizado para Swift 6.0
-- ✅ `MLNetworkLayer.swift` - Versão 2.0.0
+- ✅ `MLNetworkLayer.swift` - Versão 2.0.0 (histórico desta entrega; constante atual: 3.0.0)
 - ✅ `NetworkManager.swift` - Adicionado async/await + Sendable
 - ✅ `NetworkManagerProtocol.swift` - Nova API async
 - ✅ `RequestConfig.swift` - Sendable + fix typo
@@ -327,7 +329,7 @@ $ swift test
 
 2. **Atualize suas dependências**
    ```swift
-   .package(url: "URL", from: "2.0.0")
+   .package(url: "URL", from: "3.0.0")
    ```
 
 3. **Migre para async/await** (gradualmente)
@@ -365,8 +367,8 @@ $ swift test
 
 2. ✅ **Criar tag de versão**
    ```bash
-   git tag -a v2.0.0 -m "Version 2.0.0 - Swift 6 Migration"
-   git push origin v2.0.0
+   git tag -a v3.0.0 -m "Version 3.0.0"
+   git push origin v3.0.0
    ```
 
 3. ✅ **Publicar Release no GitHub**
@@ -407,7 +409,7 @@ O projeto está **pronto para produção** com Swift 6 e segue as melhores prát
 
 **Versão do Documento:** 1.0  
 **Data:** 12 de Outubro de 2025  
-**Versão do Framework:** 2.0.0  
+**Versão do Framework (referência deste resumo):** 2.0.0 — **versão atual:** 3.0.0  
 **Swift Version:** 6.0+  
 **Autor:** Michel Tlutz
 

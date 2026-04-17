@@ -9,6 +9,21 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [3.0.0] - 2026-04-17
+
+### Adicionado
+- Testes com **Swift Testing** (`@Test`, `#expect`, `#require`), em ficheiros por domínio sob `Tests/MLNetworkLayerTests/`.
+- Infra de mock HTTP por token (`TestURLProtocolMock`) para execução paralela segura nos testes.
+- Novos casos: `ErrorHandler` com corpo JSON de erro; `RequestConfig` com `provider: .stub` e `bundleClass`.
+
+### Alterado
+- **`MLNetworkLayer.VERSION`:** `3.0.0`.
+- Mensagens de *deprecation* da API baseada em callbacks: remoção **reagendada para a versão 4.0** (na v2.0 estava anunciada para a v3.0; a v3.0 mantém compatibilidade e alinha o roadmap à v4.0).
+
+### Documentação
+- `README.md`, `DOCUMENTATION.md` e exemplos SPM atualizados para `from: "3.0.0"`.
+- Secção de migração **De 2.x para 3.0** no README.
+
 ## [2.0.0] - 2025-10-12
 
 ### 🚀 Adicionado
