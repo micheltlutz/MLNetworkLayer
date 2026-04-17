@@ -24,8 +24,7 @@ let package = Package(
         .target(
             name: "MLNetworkLayer",
             swiftSettings: [
-                .enableUpcomingFeature("StrictConcurrency"),
-                .enableExperimentalFeature("StrictConcurrency")
+                .enableUpcomingFeature("StrictConcurrency")
             ]
         ),
         .testTarget(

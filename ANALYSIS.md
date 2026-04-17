@@ -7,7 +7,7 @@
 ## 📊 Resumo Executivo
 
 **Versão Atual:** 1.1.0 (Swift 5.10)  
-**Versão Alvo:** 2.0.0 (Swift 6.0+)  
+**Versão Alvo:** 3.0.0 (Swift 6.0+)  
 **Status:** ⚠️ Necessita modernização significativa
 
 ### Pontos Fortes 💪

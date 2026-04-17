@@ -1,5 +1,6 @@
 # 📚 Documentação MLNetworkLayer
 
+> **Versão:** 3.0.0 (`MLNetworkLayer.VERSION`)  
 > **Autor:** Michel Tlutz  
 > **Website:** [micheltlutz.me](https://micheltlutz.me)  
 > **GitHub:** [@micheltlutz](https://github.com/micheltlutz)
@@ -13,6 +14,17 @@
 - [Exemplos Práticos](#exemplos-práticos)
 - [Tratamento de Erros](#tratamento-de-erros)
 - [Extensibilidade](#extensibilidade)
+- [Documentação DocC e concorrência](#documentação-docc-e-concorrência)
+
+---
+
+## Documentação DocC e concorrência
+
+- **DocC:** pasta [`Sources/MLNetworkLayer/MLNetworkLayer.docc/`](Sources/MLNetworkLayer/MLNetworkLayer.docc/) com `MLNetworkLayer.md` (raiz do módulo) e `ConcurrencyAndSafety.md` (concorrência, cancelamento, contrato de `RequestConfig`).
+- **Xcode:** **Product → Build Documentation** para visualizar símbolos e artigos.
+- **`NetworkManager`:** instância `Sendable`; cada requisição usa um `JSONDecoder` dedicado (sem compartilhamento mutável entre tarefas).
+- **Tipos de resposta:** `T` e `H` em `request(with:)` devem ser `Decodable & Sendable`.
+- **`RequestConfig`:** permanece `@unchecked Sendable` por causa de `[String: Any]`; evite mutar a mesma instância durante uma requisição ativa.
 
 ---
 
@@ -795,14 +807,14 @@ Adicione ao seu `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/micheltlutz/MLNetworkLayer.git", from: "2.0.0")
+    .package(url: "https://github.com/micheltlutz/MLNetworkLayer.git", from: "3.0.0")
 ]
 ```
 
 Ou via Xcode:
 1. File > Add Packages...
 2. Cole a URL do repositório
-3. Selecione a versão desejada
+3. Selecione a versão desejada (recomendado: **3.0.0** ou superior, alinhado ao `from:` acima)
 
 ---
 

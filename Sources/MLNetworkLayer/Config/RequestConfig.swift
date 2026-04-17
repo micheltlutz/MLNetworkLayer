@@ -1,6 +1,13 @@
 import Foundation
 
-/// This implementation for `RequestConfigProtocol` form generic requests
+/// Implementação padrão de ``RequestConfigProtocol`` para montar URLs e parâmetros.
+///
+/// ## Concorrência
+/// O tipo é marcado como ``Sendable`` de forma não verificada (`@unchecked`) porque armazena
+/// `[String: Any]` e `AnyClass?`, que o compilador não trata como enviáveis entre isolamentos.
+/// Trate cada instância como **imutável durante a requisição**: não altere `parameters` ou
+/// `bundleClass` em paralelo enquanto uma chamada a ``NetworkManager`` está em curso; para
+/// novas requisições, prefira cópias ou valores novos.
 public struct RequestConfig: RequestConfigProtocol, @unchecked Sendable {
     /// The config's base `SCHEME` http, https.
     public var scheme: String

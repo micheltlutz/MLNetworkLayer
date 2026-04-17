@@ -1,5 +1,6 @@
 import Foundation
 
-public final class ResourceCreated: Decodable, @unchecked Sendable {
+/// Marcador de resposta vazia para operações HTTP que retornam 201 sem corpo JSON.
+public final class ResourceCreated: Decodable, Sendable {
     public init() { }
 }

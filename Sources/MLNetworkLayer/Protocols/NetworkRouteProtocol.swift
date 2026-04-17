@@ -1,7 +1,7 @@
 import Foundation
 
-///The NetworkRouteProtocol
+/// Abstração de rota que expõe uma ``RequestConfigProtocol`` (útil em camadas de domínio ou MVVM).
 public protocol NetworkRouteProtocol: Sendable {
-    ///The `RequestConfigProtocol`
+    /// Configuração usada para montar a requisição.
     var config: RequestConfigProtocol { get }
 }

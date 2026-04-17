@@ -1,6 +1,6 @@
 import Foundation
 
-/// The `NetworkErrors`  types
+/// Erros de transporte, decodificação e URL usados pela camada de rede antes ou depois da resposta HTTP.
 public enum NetworkErrors: NSInteger, LocalizedError, NetworkErrorsProtocol {
     case decoderFailure = -1001
     case malformedUrl = -1002
