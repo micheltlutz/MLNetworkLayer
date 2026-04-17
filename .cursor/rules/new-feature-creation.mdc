@@ -1,0 +1,246 @@
+---
+description: "Regra de Prompt Rápido para Criação de Nova Feature no padrão MVVM com Swift/SwiftUI e arquitetura modular"
+globs:
+  - "**/*.swift"
+alwaysApply: true
+---
+
+# Prompt Rápido - Criação de Nova Feature
+
+## Instruções para o Assistente
+
+**IMPORTANTE: SIGA ESTAS REGRAS RIGOROSAMENTE**
+
+1. **PASSO A PASSO** - Não avance sem validação  
+2. **TESTE UNITÁRIO** - Crie testes para cada componente  
+3. **BUILD VALIDATION** - Faça build após cada etapa  
+4. **SEM COMMIT** - SEMPRE perguntar antes de fazer commit  
+5. **VALIDAÇÕES** - Pare para validação antes de avançar  
+6. **QUESTIONAMENTOS** - Faça perguntas sempre que tiver dúvidas  
+7. **ARQUITETURA MODULAR** - Use a estrutura de módulos existente
+8. **SIMULADOR ESPECÍFICO** - Use iPhone 17 Pro Max iOS 26
+
+## Arquitetura Modular Atual
+
+### Módulos Existentes:
+- **Core**: Funcionalidades base e utilitários
+- **DashboardKit**: Dashboard principal e cards
+- **DesignSystemKit**: Componentes de UI e design system
+- **FirebaseKit**: Integração com Firebase
+- **FuelKit**: Gestão de combustível
+- **GarageKit**: Gestão de garagem e motocicletas
+- **MaintenanceKit**: Manutenção de veículos
+- **OnboardingKit**: Fluxo de onboarding
+- **PremiumKit**: Funcionalidades premium
+- **SettingsKit**: Configurações do app
+- **SharedKit**: Componentes compartilhados
+- **TireKit**: Gestão de pneus e calibração
+
+### Estrutura de Módulos:
+```
+Modules/[ModuleName]/
+├── Sources/[ModuleName]/
+│   ├── Domain/
+│   │   └── Entities/
+│   ├── Data/
+│   │   └── SwiftData/
+│   ├── Presentation/
+│   │   ├── View/
+│   │   └── ViewModel/
+│   └── Resources/
+└── Tests/[ModuleName]Tests/
+```
+
+## Configuração do Simulador
+
+### Simulador Obrigatório:
+- **Device**: iPhone 17 Pro Max
+- **iOS Version**: 26
+- **Identifier**: 9EA54B0E-3CC6-4E04-A6D2-23D5B438FE57
+
+### Comandos de Build:
+```bash
+# Build para simulador específico
+xcodebuild build \
+  -workspace RideKeeper.xcworkspace \
+  -scheme RideKeeper \
+  -destination 'platform=iOS Simulator,id=9EA54B0E-3CC6-4E04-A6D2-23D5B438FE57'
+
+# Testes no simulador específico
+xcodebuild test \
+  -workspace RideKeeper.xcworkspace \
+  -scheme RideKeeper \
+  -destination 'platform=iOS Simulator,id=9EA54B0E-3CC6-4E04-A6D2-23D5B438FE57'
+```  
+
+---
+
+## Template de Resposta
+
+### ETAPA 1: Definição
+**PARE AQUI - Aguardar validação**
+
+1. **Definir Feature:**
+   - Nome: [PERGUNTAR]
+   - Entidade: [PERGUNTAR]
+   - Campos: [PERGUNTAR]
+   - Relacionamentos: [PERGUNTAR]
+
+2. **Questionamentos:**
+   - Qual o nome da feature?
+   - Qual a entidade principal?
+   - Quais campos são necessários?
+   - Tem relacionamento com Motorcycle?
+   - Quais operações CRUD?
+
+**⏸️ VALIDAÇÃO OBRIGATÓRIA - Não prosseguir sem confirmação**
+
+---
+
+### ETAPA 2: Entidade
+**PARE AQUI - Aguardar validação**
+
+1. **Definir módulo apropriado** (Core, GarageKit, FuelKit, etc.)
+2. Criar entidade em `Modules/[ModuleName]/Sources/[ModuleName]/Domain/Entities/Entities.swift`  
+3. Atualizar schema no `RideKeeper/Data/SwiftData/ModelContainerManager.swift`  
+4. Criar teste unitário em `Modules/[ModuleName]/Tests/[ModuleName]Tests/`
+5. Executar build no simulador específico
+
+**⏸️ VALIDAÇÃO OBRIGATÓRIA - Build deve passar no iPhone 17 Pro Max iOS 26**
+
+---
+
+### ETAPA 3: Data Manager
+**PARE AQUI - Aguardar validação**
+
+1. Criar `Modules/[ModuleName]/Sources/[ModuleName]/Data/SwiftData/[Domain]DataManager.swift`  
+2. Implementar operações CRUD  
+3. Implementar tratamento de erros  
+4. Criar testes unitários em `Modules/[ModuleName]/Tests/[ModuleName]Tests/`
+5. Executar build no simulador específico
+
+**⏸️ VALIDAÇÃO OBRIGATÓRIA - Build deve passar no iPhone 17 Pro Max iOS 26**
+
+---
+
+### ETAPA 4: ViewModel
+**PARE AQUI - Aguardar validação**
+
+1. Criar `Modules/[ModuleName]/Sources/[ModuleName]/Presentation/ViewModel/[Feature]ViewModel.swift`  
+2. Implementar estados reativos (@Published)  
+3. Implementar operações CRUD  
+4. Criar testes unitários em `Modules/[ModuleName]/Tests/[ModuleName]Tests/`
+5. Executar build no simulador específico
+
+**⏸️ VALIDAÇÃO OBRIGATÓRIA - Build deve passar no iPhone 17 Pro Max iOS 26**
+
+---
+
+### ETAPA 5: Views
+**PARE AQUI - Aguardar validação**
+
+1. Criar `Modules/[ModuleName]/Sources/[ModuleName]/Presentation/View/[Feature]View.swift` (principal)  
+2. Criar `Modules/[ModuleName]/Sources/[ModuleName]/Presentation/View/Add[Entity]View.swift` (formulário)  
+3. Criar `Modules/[ModuleName]/Sources/[ModuleName]/Presentation/View/[Entity]RowView.swift` (linha)  
+4. Implementar estados (loading, empty, error)  
+5. Criar testes unitários em `Modules/[ModuleName]/Tests/[ModuleName]Tests/`
+6. Executar build no simulador específico
+
+**⏸️ VALIDAÇÃO OBRIGATÓRIA - Build deve passar no iPhone 17 Pro Max iOS 26**
+
+---
+
+### ETAPA 6: Integração
+**PARE AQUI - Aguardar validação**
+
+1. Adicionar ao `RideKeeper/Presentation/MainTabView.swift`  
+2. Adicionar strings de localização em `Modules/[ModuleName]/Sources/[ModuleName]/Resources/`
+3. Configurar analytics usando `FirebaseKit`
+4. Executar build no simulador específico
+
+**⏸️ VALIDAÇÃO OBRIGATÓRIA - Build deve passar no iPhone 17 Pro Max iOS 26**
+
+---
+
+### ETAPA 7: Testes Finais
+**PARE AQUI - Aguardar validação**
+
+1. Testes de integração no simulador específico
+2. Validação de UI/UX no iPhone 17 Pro Max iOS 26
+3. Validação de performance
+4. Checklist final
+5. Teste em diferentes orientações (portrait/landscape)
+
+**⏸️ VALIDAÇÃO OBRIGATÓRIA - Tudo deve funcionar no iPhone 17 Pro Max iOS 26**
+
+---
+
+## Questionamentos Obrigatórios
+
+### Antes de Começar:
+- Qual feature você quer criar?  
+- Qual a entidade principal?  
+- Quais campos são necessários?  
+- Tem relacionamento com outras entidades?  
+- Quais operações CRUD?
+- **Qual módulo é mais apropriado?** (Core, GarageKit, FuelKit, TireKit, etc.)
+- **A feature é específica de um domínio ou compartilhada?**  
+
+### Durante Desenvolvimento:
+- Está seguindo os padrões?  
+- Os testes estão passando?  
+- O build está funcionando no iPhone 17 Pro Max iOS 26?  
+- O módulo escolhido é o mais apropriado?
+- Precisa de ajuda?  
+- Quer fazer alterações?  
+
+### Antes do Commit:
+- Todos os testes passando no iPhone 17 Pro Max iOS 26?  
+- Build limpo no simulador específico?
+- Feature funcionando corretamente?
+- Módulo organizado adequadamente?
+- Quer revisar código?  
+- Precisa de ajustes?  
+
+---
+
+## Diretrizes de Módulos
+
+### Escolha do Módulo:
+- **Core**: Funcionalidades base, utilitários, modelos compartilhados
+- **GarageKit**: Motocicletas, garagem, veículos
+- **FuelKit**: Combustível, abastecimentos, consumo
+- **TireKit**: Pneus, calibração, pressão
+- **MaintenanceKit**: Manutenção, serviços, lembretes
+- **PremiumKit**: Funcionalidades premium, assinaturas
+- **DashboardKit**: Dashboard, cards, resumos
+- **DesignSystemKit**: Componentes de UI, design system
+- **SettingsKit**: Configurações, preferências
+- **OnboardingKit**: Primeiro uso, tutoriais
+- **FirebaseKit**: Integração Firebase, analytics
+- **SharedKit**: Componentes compartilhados entre módulos
+
+### Regras de Módulos:
+- **Uma feature = Um módulo** (quando possível)
+- **Dependências mínimas** entre módulos
+- **Interfaces claras** entre módulos
+- **Testes isolados** por módulo
+- **Recursos próprios** por módulo
+
+## Lembretes
+
+- **NUNCA** avance sem validação  
+- **SEMPRE** faça testes unitários  
+- **SEMPRE** execute build no iPhone 17 Pro Max iOS 26
+- **SEMPRE** pergunte antes de commit  
+- **SEMPRE** faça questionamentos  
+- **SEMPRE** siga os padrões
+- **SEMPRE** use a arquitetura modular
+- **SEMPRE** escolha o módulo apropriado  
+
+---
+
+## Suporte
+
+Se tiver dúvidas, **PARE e pergunte**.  
+É melhor esclarecer do que implementar incorreto.

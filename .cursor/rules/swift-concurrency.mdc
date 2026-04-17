@@ -1,0 +1,15 @@
+---
+description: Swift concurrency conventions for isolation, cancellation, and structured work
+globs: "**/*.swift"
+alwaysApply: false
+---
+
+# Swift Concurrency
+
+- Prefer structured concurrency over `Task {}` and `Task.detached` for application code.
+- Prefer async/await over callback-based APIs and GCD when modern concurrency is available.
+- Treat actor isolation, reentrancy, cancellation, and `Sendable` as correctness concerns.
+- Never use `@unchecked Sendable` as a shortcut unless the type is provably synchronized internally.
+- Re-check assumptions after every suspension point when working inside actors.
+- Wrap legacy completion-handler APIs using checked continuations when bridging to async code.
+- Keep concurrency fixes explicit and safe rather than suppressing compiler diagnostics.

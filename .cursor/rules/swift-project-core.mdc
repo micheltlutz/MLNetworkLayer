@@ -1,0 +1,27 @@
+---
+description: Core standards for Swift mobile projects using Cursor
+alwaysApply: true
+---
+
+# Swift Project Core
+
+- Assume Swift 6.2+ and modern Swift concurrency by default.
+- Prefer SwiftUI for UI, SwiftData for persistence, and Swift Testing for unit and integration tests.
+- Use UIKit only when the request or platform constraints clearly require it.
+- Do not introduce third-party frameworks without explicit approval.
+- Organize code by feature when practical, and keep one primary type per Swift file.
+- Prefer async/await over callback-based APIs when both are available.
+- For tests, use Swift Testing unless the task is specifically about UI tests.
+- Preserve existing app conventions when they are already compatible with these rules.
+
+## Localization
+
+- All user-facing strings MUST be localized. Never use hardcoded string literals in Views, ViewModels, or any UI layer.
+- Every new string requires two steps:
+  1. Add a `snake_case` key and its translation to **all** `Localizable.strings` files under `Modules/DesignSystemKit/Sources/DesignSystemKit/Resources/` (currently `en.lproj` and `pt-BR.lproj`).
+  2. Add a matching `camelCase` case to the `StringsKey` enum in `Modules/DesignSystemKit/Sources/DesignSystemKit/Localization.swift`.
+- Always use `L.localized(.yourKey)` (or `L.localized(.yourKey, arg1, ...)` for format strings) — never call `NSLocalizedString` directly in feature code.
+- Group keys by feature inside `StringsKey` using a `// MARK: - FeatureName` comment.
+- Key naming convention: `<feature>_<description>` in snake_case (e.g. `fuel_add_title`, `garage_empty_state`).
+- Parameterized strings use `%@` for strings and `%d`/`%.1f` for numbers in `.strings` files, and pass arguments via `L.localized(.key, arg)`.
+- Do not duplicate existing keys — search `StringsKey` before adding a new one.

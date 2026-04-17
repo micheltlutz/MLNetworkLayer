@@ -1,0 +1,14 @@
+---
+description: SwiftData conventions for models, predicates, and persistence boundaries
+globs: "**/*.swift"
+alwaysApply: false
+---
+
+# SwiftData
+
+- Prefer SwiftData over Core Data unless a required feature is unavailable.
+- Use `@Query` only inside SwiftUI views; outside views, use `ModelContext` and `FetchDescriptor`.
+- Make relationships explicit when behavior matters, including inverse and delete rules.
+- Keep predicates within supported SwiftData operations and avoid known runtime crash patterns.
+- Consider indexing, CloudKit constraints, and model inheritance only when the deployment target and feature set require them.
+- Favor clarity and correctness of the data model over clever query shortcuts.

@@ -1,0 +1,15 @@
+---
+description: Swift Testing conventions for modern unit and integration tests
+globs: "**/*Tests.swift"
+alwaysApply: false
+---
+
+# Swift Testing
+
+- Write new unit and integration tests with Swift Testing, not XCTest.
+- Use `struct` suites, `@Test`, `#expect`, and `#require` as the default testing style.
+- Prefer `init` and `deinit` over `setUp()` and `tearDown()` patterns when setup is needed.
+- Keep tests deterministic, isolated, and friendly to dependency injection.
+- Prefer parameterized tests and focused assertions over repetitive test bodies.
+- For async tests, avoid timing hacks and rely on Swift Testing tools that express intent clearly.
+- Use XCTest only for UI tests or when tooling constraints make Swift Testing impossible.

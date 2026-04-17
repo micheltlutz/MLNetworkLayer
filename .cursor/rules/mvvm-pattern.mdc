@@ -1,0 +1,5 @@
+---
+description:"Convenção de uso do padrão MVVM (Swift/SwiftUI) — estrutura, responsabilidades, nomeação, testes e práticas recomendadas para geração de código pelo agente."
+globs:
+"**/*.swift"
+---

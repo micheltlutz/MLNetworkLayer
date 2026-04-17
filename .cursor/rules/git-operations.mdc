@@ -1,0 +1,237 @@
+---
+description: "Regra para controle de operações Git - commit, push e merge requerem confirmação explícita do usuário."
+globs:
+  - "**/*"
+alwaysApply: true
+---
+
+# Regra de Controle de Operações Git
+
+## Objetivo
+Garantir que todas as operações Git críticas (commit, push, merge) sejam executadas apenas após confirmação explícita do usuário, permitindo testes e validação antes de aplicar mudanças ao repositório.
+
+## PROIBIÇÕES ABSOLUTAS (SEM CONFIRMAÇÃO EXPLÍCITA)
+
+### Operações Git Proibidas
+- **git commit**: Criar commits sem permissão explícita
+- **git push**: Enviar commits para repositório remoto sem confirmação
+- **git merge**: Fazer merge de branches sem aprovação
+- **git rebase**: Reorganizar commits sem permissão
+- **git reset**: Resetar commits ou mudanças sem confirmação
+- **git revert**: Reverter commits sem aprovação
+- **git cherry-pick**: Aplicar commits específicos sem permissão
+
+### Operações de Branch Proibidas
+- **git branch -d/-D**: Deletar branches sem confirmação
+- **git checkout -b**: Criar novas branches sem permissão
+- **git branch -m**: Renomear branches sem aprovação
+
+## PERMISSÕES OBRIGATÓRIAS (COM CONFIRMAÇÃO EXPLÍCITA)
+
+Para qualquer operação Git crítica, o assistente DEVE:
+
+1. **Solicitar confirmação explícita** do usuário
+2. **Explicar exatamente** o que será executado
+3. **Mostrar o comando** que será executado
+4. **Aguardar aprovação** antes de executar
+5. **Permitir testes** pelo usuário antes da operação
+
+## PROCEDIMENTOS OBRIGATÓRIOS
+
+### Antes de Qualquer Operação Git Crítica
+
+1. **Explicar a operação**:
+   - O que será feito
+   - Por que é necessário
+   - Quais arquivos serão afetados
+   - Qual branch será impactada
+
+2. **Mostrar o comando**:
+   - Comando exato que será executado
+   - Parâmetros e flags utilizados
+   - Branch de origem e destino (se aplicável)
+
+3. **Solicitar confirmação**:
+   - Aguardar resposta explícita do usuário
+   - Não assumir silêncio como aprovação
+   - Permitir modificações na operação
+
+4. **Permitir testes**:
+   - Sugerir testes antes da operação
+   - Aguardar confirmação de que testes passaram
+   - Não executar se houver dúvidas
+
+### Formato de Solicitação
+
+```
+🚨 OPERAÇÃO GIT PENDENTE - CONFIRMAÇÃO NECESSÁRIA
+
+Operação: [commit/push/merge/etc.]
+Comando: git [comando] [parâmetros]
+Arquivos afetados: [lista de arquivos]
+Branch: [branch atual] → [branch destino]
+
+Descrição: [explicação detalhada]
+
+⚠️ Esta operação irá [impacto da operação]
+
+Por favor, confirme se deseja prosseguir:
+- ✅ Sim, executar
+- ❌ Não, cancelar
+- 🔄 Modificar comando
+```
+
+## OPERAÇÕES PERMITIDAS (SEM CONFIRMAÇÃO)
+
+As seguintes operações são seguras e não requerem confirmação:
+
+- **git status**: Verificar status do repositório
+- **git log**: Visualizar histórico de commits
+- **git diff**: Comparar mudanças
+- **git add**: Adicionar arquivos ao staging
+- **git stash**: Salvar mudanças temporariamente
+- **git fetch**: Buscar atualizações do remoto
+- **git pull**: Atualizar branch local (apenas se solicitado)
+- **git branch**: Listar branches
+- **git tag**: Listar tags
+
+## EXCEÇÕES DE EMERGÊNCIA
+
+Em situações de emergência (corrupção de dados, perda crítica), o assistente pode:
+
+1. **Notificar imediatamente** o usuário sobre a situação
+2. **Explicar a urgência** e o risco
+3. **Propor uma solução** com justificativa
+4. **Aguardar confirmação** mesmo em emergência
+5. **Documentar a exceção** e o motivo
+
+## VALIDAÇÃO E TESTES
+
+### Antes de Commit
+- Verificar se build está funcionando (iPhone e iPad)
+- Confirmar que testes passam em ambos os dispositivos
+- Validar que mudanças são necessárias
+- Revisar arquivos modificados
+- Testar funcionalidades no simulador específico (iPhone 17 Pro Max iOS 26)
+
+### Antes de Push
+- Confirmar que commits estão corretos
+- Verificar se não há conflitos
+- Validar que branch está atualizada
+- Testar funcionalidades afetadas
+
+### Antes de Merge
+- Verificar se branches são compatíveis
+- Confirmar que não há conflitos
+- Validar que merge é necessário
+- Testar integração das mudanças
+
+## COMANDOS DE VALIDAÇÃO
+
+### Build e Testes
+```bash
+# Verificar se projeto compila (iPhone)
+xcodebuild build -workspace RideKeeper.xcworkspace -scheme RideKeeper
+
+# Verificar se projeto compila (iPad - Simulador específico)
+xcodebuild build \
+  -workspace RideKeeper.xcworkspace \
+  -scheme RideKeeper \
+  -destination 'platform=iOS Simulator,id=9EA54B0E-3CC6-4E04-A6D2-23D5B438FE57'
+
+# Executar testes (iPhone)
+xcodebuild test -workspace RideKeeper.xcworkspace -scheme RideKeeper
+
+# Executar testes (iPad - Simulador específico)
+xcodebuild test \
+  -workspace RideKeeper.xcworkspace \
+  -scheme RideKeeper \
+  -destination 'platform=iOS Simulator,id=9EA54B0E-3CC6-4E04-A6D2-23D5B438FE57'
+```
+
+### Status do Git
+```bash
+# Verificar status
+git status
+
+# Ver mudanças
+git diff --cached
+
+# Ver histórico recente
+git log --oneline -5
+```
+
+## CHECKLIST DE VALIDAÇÃO
+
+Antes de solicitar confirmação para operação Git:
+
+- [ ] Operação é realmente necessária?
+- [ ] Comando está correto e seguro?
+- [ ] Arquivos afetados foram revisados?
+- [ ] Build e testes estão funcionando (iPhone e iPad)?
+- [ ] Testado no simulador específico (iPhone 17 Pro Max iOS 26)?
+- [ ] Compatível com regras de criação de features?
+- [ ] Usuário foi informado adequadamente?
+- [ ] Confirmação explícita foi solicitada?
+
+## COMPATIBILIDADE COM OUTRAS REGRAS
+
+### Regra de Criação de Features (new-feature-creation.mdc)
+- **Simulador Obrigatório**: iPhone 17 Pro Max iOS 26 (ID: 9EA54B0E-3CC6-4E04-A6D2-23D5B438FE57)
+- **Build Validation**: Sempre testar no simulador específico antes de commit
+- **Arquitetura Modular**: Respeitar estrutura de módulos existente
+- **Validação**: Build deve passar no simulador específico
+
+### Integração com Regras
+- Esta regra (git-operations.mdc) **complementa** a regra de criação de features
+- **Ambas** devem ser seguidas simultaneamente
+- **Validação de build** deve incluir o simulador específico
+- **Testes** devem ser executados em ambos os dispositivos
+
+## ENFORCEMENT
+
+Esta regra é **OBRIGATÓRIA** e **NÃO-NEGOCIÁVEL**. Violações resultarão em:
+
+1. Cancelamento imediato da operação
+2. Notificação ao usuário sobre a violação
+3. Revisão do processo para evitar recorrências
+4. Documentação da violação para aprendizado
+
+## EXEMPLOS DE USO CORRETO
+
+### ✅ Correto - Com Confirmação
+```
+🚨 OPERAÇÃO GIT PENDENTE - CONFIRMAÇÃO NECESSÁRIA
+
+Operação: commit
+Comando: git commit -m "feat: Add iPad fullscreen support to FuelView"
+Arquivos afetados: Modules/FuelKit/Sources/FuelKit/Presentation/View/FuelView.swift
+Branch: main
+
+Descrição: Atualizar FuelView para usar NavigationStack em vez de NavigationView, proporcionando melhor suporte fullscreen no iPad.
+
+⚠️ Esta operação irá criar um novo commit na branch main.
+
+Por favor, confirme se deseja prosseguir:
+- ✅ Sim, executar
+- ❌ Não, cancelar
+- 🔄 Modificar comando
+```
+
+### ❌ Incorreto - Sem Confirmação
+```bash
+# NUNCA fazer isso sem confirmação
+git commit -m "feat: Add feature"
+git push origin main
+git merge feature-branch
+```
+
+## LEMBRETES IMPORTANTES
+
+- **SEMPRE** solicitar confirmação para operações Git críticas
+- **NUNCA** assumir que o usuário quer que a operação seja executada
+- **SEMPRE** explicar o que será feito e por quê
+- **NUNCA** executar operações Git sem permissão explícita
+- **SEMPRE** permitir que o usuário teste antes de confirmar
+- **NUNCA** fazer push de código não testado
+- **SEMPRE** aguardar confirmação antes de prosseguir

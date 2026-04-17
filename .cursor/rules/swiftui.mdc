@@ -1,0 +1,14 @@
+---
+description: SwiftUI conventions for views, state, accessibility, and performance
+globs: "**/*.swift"
+alwaysApply: false
+---
+
+# SwiftUI
+
+- Prefer native SwiftUI APIs and patterns over UIKit bridges.
+- Use modern navigation APIs such as `NavigationStack` and `NavigationSplitView` for new flows.
+- Favor current styling APIs and avoid deprecated or soft-deprecated view modifiers.
+- Check accessibility by default: VoiceOver labels, Dynamic Type, contrast, and reduced motion.
+- Keep view bodies lightweight, avoid side effects in `body`, and prefer smaller composable views.
+- Treat state and data flow as correctness issues, not cosmetic refactors.
